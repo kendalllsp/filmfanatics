@@ -1,21 +1,38 @@
 .main {
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     padding: 6rem;
     min-height: 100vh;
-    background: linear-gradient(217deg, rgba(218, 231, 245, 0.8), rgba(218, 231, 245, 0) 70.71%), linear-gradient(127deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70.71%), linear-gradient(336deg, rgba(230, 241, 237, 0.8), rgba(230, 241, 237, 0) 70.71%);
+}
+
+.homePage {
+    background: linear-gradient(225deg, rgba(255, 92, 51, 0.8), rgba(255, 92, 51, 0) 70.71%), linear-gradient(135deg, rgba(6, 82, 221, 0.8), rgba(6, 82, 221, 0) 70.71%);
+}
+
+
+.actorsPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem;
+    min-height: 100vh;
+    background: linear-gradient(225deg, rgba(255, 92, 51, 0.9), rgba(255, 92, 51, 0) 70.71%), linear-gradient(135deg, rgba(6, 82, 221, 0.9), rgba(6, 82, 221, 0) 70.71%);
+    font-family: var(--font-family);
 }
 
 .description {
     display: inherit;
-    justify-content: inherit;
+    justify-content: center;
     align-items: inherit;
     font-size: 1rem;
     max-width: var(--max-width);
     width: 100%;
     z-index: 2;
+    text-align: center;
 }
 
     .description a {
@@ -29,9 +46,8 @@
         font-weight: 600;
         position: relative;
         margin-bottom: 2rem;
-        margin-top: 0rem;
+        margin-top: 2rem;
         padding: 1rem;
-        background-color: rgba(var(--callout-rgb), 0.1);
         border-radius: var(--border-radius);
         text-align: center;
         font-size: 1.5rem;
@@ -40,26 +56,42 @@
 .headers {
     padding: 0.5rem;
     border-radius: 5px;
-    background-color: rgba(var(--card-rgb), 0);
     border: 1px solid rgba(var(--card-border-rgb), 0);
     transition: background 200ms, border 200ms;
     display: flex;
     flex-direction: column;
+    gap: 0;
 }
     .headers h1 {
         font-weight: 900;
         text-decoration: underline;
-        margin-bottom: 0rem;
+        margin: 0rem;
         text-align: center;
         font-size: 10rem;
+        background-color: rgba(var(--card-rgb), 0);
     }
     .headers h3 {
         font-weight: 600;
         text-decoration: underline;
         margin-top: 0rem;
-        margin-bottom: 2rem;
+        margin-bottom: 0rem;
         text-align: center;
         font-size: 4rem;
+        background-color: rgba(var(--card-rgb), 0);
+    }
+    .headers h4 {
+        font-weight: 900;
+        text-decoration: underline;
+        margin: 0rem;
+        text-align: center;
+        font-size: 8rem;
+        padding: 2rem;
+        border-radius: 8px;
+        background-color: rgba(var(--callout-rgb), 0.25);
+        border: 1px solid rgba(var(--card-border-rgb), 0.25);
+        transition: background 200ms, border 200ms;
+        display: flex;
+        flex-direction: column;
     }
 
 .code {
@@ -69,20 +101,20 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     max-width: 100%;
     width: var(--max-width);
 }
 
 .card {
-    padding: 2rem; 
+    padding: 2rem;
     border-radius: 8px;
-    background-color: rgba(var(--card-rgb), 0);
-    border: 1px solid rgba(var(--card-border-rgb), 0.15);
+    background-color: rgba(var(--callout-rgb), 0.25);
+    border: 1px solid rgba(var(--card-border-rgb), 0.25);
     transition: background 200ms, border 200ms;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
 
     .card:hover {
@@ -103,6 +135,90 @@
         font-size: 1rem; 
         line-height: 1.5;
         text-align: center;
+    }
+.selected {
+    padding: 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    transition: background 200ms, border 200ms;
+    background-color: rgba(var(--card-rgb), 0.1);
+    border: 3px solid rgba(var(--card-border-rgb), 5);
+}
+    .selected:hover {
+        background-color: rgba(var(--card-rgb), 0.1);
+        border: 3px solid rgba(var(--card-border-rgb), 5);
+    }
+
+    .selected h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .selected p {
+        margin: 0;
+        opacity: 0.8;
+        font-size: 1rem;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+.dropdown {
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+}
+
+    .dropdown label {
+        font-weight: 600;
+        position: relative;
+        display: inline-block;
+        margin-right: 1rem;
+        margin-bottom: 1.5rem;
+        margin-top: 1.25rem;
+        text-align: center;
+        font-size: 1.5rem;
+        white-space: nowrap;
+    }
+
+    .dropdown select {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: rgba(var(--callout-rgb), 0.25);
+        font-family: var(--font-family);
+        font-weight: 500;
+    }
+
+        .dropdown select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+.searchButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 2rem;
+    font-family: var(--font-family);
+}
+
+    .searchButton:hover {
+        background-color: #0056b3;
+    }
+
+    .searchButton:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
 
 .center {
@@ -135,6 +251,27 @@
         position: absolute;
         filter: blur(45px);
         transform: translateZ(0);
+    }
+
+.backButton {
+    display: inline-block;
+    justify-content: left;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1rem;
+    margin-left: 3.5rem;
+    margin-top: 2.5rem;
+    background-color: rgba(var(--callout-rgb), 0.25);
+    border: 1px solid rgba(var(--card-border-rgb), 0.25);
+    border-radius: 8px;
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 15px;
+}
+    .backButton:hover {
+        background: rgba(var(--card-rgb), 0.1);
+        border: 1px solid rgba(var(--card-border-rgb), 0.15);
     }
 
 .logo {
