@@ -85,10 +85,6 @@
         margin: 0rem;
         text-align: center;
         font-size: 8rem;
-        padding: 2rem;
-        border-radius: 8px;
-        background-color: rgba(var(--callout-rgb), 0.25);
-        border: 1px solid rgba(var(--card-border-rgb), 0.25);
         transition: background 200ms, border 200ms;
         display: flex;
         flex-direction: column;
@@ -268,6 +264,7 @@
     font-family: var(--font-family);
     font-weight: 600;
     font-size: 15px;
+    text-decoration: underline;
 }
     .backButton:hover {
         background: rgba(var(--card-rgb), 0.1);
