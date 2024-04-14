@@ -5,11 +5,13 @@ import "../app/globals.css";
 import { Inter } from "next/font/google";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 export default function Actors() {
-    const router = useRouter();
     const [selectedActor, setSelectedActor] = useState('');
     const [selectedQuery, setSelectedQuery] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleActorChange = (event) => {
         setSelectedActor(event.target.value);
@@ -19,16 +21,30 @@ export default function Actors() {
         setSelectedQuery(query);
     };
 
-    const handleSearch = () => {
-        console.log('Search clicked:', selectedActor, selectedQuery);
-        if (selectedActor && selectedQuery) {
-            // redirecting to results page
+    const handleSearch = async () => {
+        try {
             if (selectedActor && selectedQuery) {
-                router.push(`/actorResults?actor=${selectedActor}&query=${selectedQuery}`);
+                setLoading(true); // set loading state to true
+                setError(null); // reset error state
+
+                // make HTTP request to backend API
+                const response = await axios.get(`/api/${selectedQuery}`, {
+                    params: {
+                        actorName: selectedActor,
+                        // add any other parameters for the API
+                    }
+                });
+
+                console.log('API response:', response.data);
             }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('An error occurred. Please try again.');
+        } finally {
+            setLoading(false); // reset loading state
         }
-        // add search stuff here
     };
+
 
     return (
 
@@ -84,9 +100,13 @@ export default function Actors() {
                 </div>
             </div>
 
-            
 
-            <button className={styles.searchButton} onClick={handleSearch}>Search</button>
+            <button className={styles.searchButton} onClick={handleSearch} disabled={loading}>
+                {loading ? 'Searching...' : 'Search'}
+            </button>
+
+            {error && <p className={styles.error}>{error}</p>} // show error
+
         </main>
     );
 }
