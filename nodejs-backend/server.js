@@ -73,19 +73,67 @@ ORDER BY gc.Year
 app.get('/api/query2', async (req, res) => {
     try {
         // extract parameters from request, if any
-        const { actorName, timeRange } = req.query;
+        const { startYear, endYear } = req.query;
+        if (!startYear || !endYear) {
+            return res.status(400).json({ error: 'Start year and end year are required' });
+        }
 
-        // connect to Oracle database
         const connection = await oracledb.getConnection(dbConfig);
 
-        // execute SQL query (example written here)
-        //const result = await connection.execute(`SELECT * FROM table_name WHERE actor = :actorName AND time BETWEEN :startDate AND :endDate`, [actorName, timeRange.startDate, timeRange.endDate]);
-
-        // send query results to frontend
-        //res.json(result.rows);
-
-        // release the database connection
+        // Query 1: User Rating Variability
+        const query1 = `
+            WITH user_rating_variability AS (
+                SELECT EXTRACT(YEAR FROM TO_DATE(:startDate, 'YYYY')) AS ratingYear,
+                       r.userId,
+                       STDDEV(r.starrating) AS Rating_Standard_Deviation
+                FROM ratings r
+                WHERE TO_DATE(:startDate, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+                      AND TO_DATE(:endDate, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+                GROUP BY EXTRACT(YEAR FROM TO_DATE(:startDate, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')), r.userid
+            )
+            SELECT ratingYear,
+                   ROUND(AVG(Rating_Standard_Deviation), 2) AS Average_Rating_Std_Deviation
+            FROM user_rating_variability
+            GROUP BY ratingYear
+            ORDER BY ratingYear
+        `;
+        
+        const result1 = await connection.execute(query1, { startDate: startYear, endDate: endYear });
+// Query 2: Rating Trends
+        const query2 = `
+            WITH RatingTrends AS (
+                SELECT
+                    m.title,
+                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY')) AS rating_month,
+                    ROUND(AVG(r.starrating), 2) AS avg_rating
+                FROM
+                    movie m, ratings r
+                WHERE
+                    m.movieid = r.movieid
+                      AND TO_DATE(:startDate, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+                      AND TO_DATE(:endDate, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+                GROUP BY
+                    m.title,
+                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
+                ORDER BY
+                    m.title,
+                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
+            )
+            SELECT
+                title,
+                rating_month,
+                avg_rating,
+                ROUND(AVG(avg_rating) OVER (PARTITION BY title ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW), 2) AS moving_avg_rating
+            FROM RatingTrends
+        `;
+        
+        const result2 = await connection.execute(query2, { startDate: startYear, endDate: endYear });
+        
         await connection.close();
+
+        // Combine and send results
+        res.json({ userRatingVariability: result1.rows, ratingTrends: result2.rows });
+        
     } catch (error) {
         console.error('Error executing SQL query:', error);
         res.status(500).json({ error: 'Internal server error' });
