@@ -140,6 +140,61 @@ app.get('/api/query2', async (req, res) => {
     }
 });
 
+// Define API endpoint for Query 5
+app.get('/api/query5', async (req, res) => {
+    try {
+        const connection = await oracledb.getConnection(dbConfig);
+
+        // execute SQL query
+        const result = await connection.execute(`
+            WITH UserRatingStats AS (
+                SELECT
+                    r.userId,
+                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') AS rating_month,
+                    AVG(r.starrating) AS avg_rating,
+                    COUNT(r.starrating) AS num_ratings
+                FROM
+                    ratings r
+                GROUP BY
+                    r.userId, TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH')
+            ),
+            UserSegments AS (
+                SELECT
+                    userId,
+                    rating_month,
+                    avg_rating,
+                    num_ratings,
+                    NTILE(5) OVER (PARTITION BY rating_month ORDER BY avg_rating DESC) AS rating_segment
+                FROM
+                    UserRatingStats
+            )
+            SELECT
+                rating_month,
+                rating_segment,
+                COUNT(DISTINCT userId) AS num_users,
+                ROUND(AVG(avg_rating), 2) AS avg_rating,
+                ROUND(AVG(num_ratings), 2) AS avg_num_ratings
+            FROM
+                UserSegments
+            GROUP BY
+                rating_month,
+                rating_segment
+            ORDER BY
+                rating_month,
+                rating_segment
+        `);
+
+        // send query results to frontend
+        res.json(result.rows);
+
+        await connection.close();
+    } catch (error) {
+        console.error('Error executing SQL query:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 // start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
