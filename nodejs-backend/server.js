@@ -143,6 +143,11 @@ app.get('/api/query2', async (req, res) => {
 // Define API endpoint for Query 5
 app.get('/api/query5', async (req, res) => {
     try {
+        // Extract parameters from request, if any
+        const { startYear, endYear } = req.query;
+        if (!startYear || !endYear) {
+            return res.status(400).json({ error: 'Start year and end year are required' });
+        }
         const connection = await oracledb.getConnection(dbConfig);
 
         // execute SQL query
@@ -155,6 +160,8 @@ app.get('/api/query5', async (req, res) => {
                     COUNT(r.starrating) AS num_ratings
                 FROM
                     ratings r
+                WHERE 
+                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') BETWEEN TO_DATE('01-JAN-' || :startYear, 'DD-MON-YYYY') AND TO_DATE('31-DEC-' || :endYear, 'DD-MON-YYYY')
                 GROUP BY
                     r.userId, TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH')
             ),
@@ -182,7 +189,7 @@ app.get('/api/query5', async (req, res) => {
             ORDER BY
                 rating_month,
                 rating_segment
-        `);
+        `, [startYear, endYear]);
 
         // send query results to frontend
         res.json(result.rows);
