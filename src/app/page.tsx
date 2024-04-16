@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -18,24 +17,15 @@ export default function Home() {
 
                 <div className={styles.grid}>
                     <a
-                        href="/actors"
+                        href="/querySelection"
                         className={styles.card}
                     >
                         <h2>
-                            ACTORS
+                            SELECT A QUERY
                         </h2>
-                        <p>Click here to discover insights about actors, including ratings in best genres, directors, and co-actors.</p>
+                        <p>Click here to discover insights about movies through 5 available queries.</p>
                     </a>
 
-                    <a
-                        href="/movies"
-                        className={styles.card}
-                    >
-                        <h2>
-                            MOVIES
-                        </h2>
-                        <p>Click here to find trends in movies, such as decade-based similarity, ratings over the years, and director success in genres.</p>
-                    </a>
                 </div>
             </main>
         </div>

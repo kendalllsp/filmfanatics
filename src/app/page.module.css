@@ -13,26 +13,36 @@
 }
 
 
-.actorsPage {
+.queriesPage {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 6rem;
-    min-height: 100vh;
+    padding: 0rem;
+    min-height: 50vh;
     background: linear-gradient(225deg, rgba(255, 92, 51, 0.9), rgba(255, 92, 51, 0) 70.71%), linear-gradient(135deg, rgba(6, 82, 221, 0.9), rgba(6, 82, 221, 0) 70.71%);
     font-family: var(--font-family);
 }
+    .queriesPage title {
+        font-weight: 900;
+        text-decoration: underline;
+        margin: 0rem;
+        text-align: center;
+        font-size: 6rem;
+        display: flex;
+        flex-direction: column;
+    }
 
 .description {
     display: inherit;
     justify-content: center;
-    align-items: inherit;
+    align-items: center;
     font-size: 1rem;
     max-width: var(--max-width);
     width: 100%;
     z-index: 2;
     text-align: center;
+    padding: 0.25rem;
 }
 
     .description a {
@@ -40,6 +50,8 @@
         justify-content: center;
         align-items: center;
         gap: 0.5rem;
+        font-weight: 400;
+        font-size: 1.2rem;
     }
 
     .description p {
@@ -52,6 +64,35 @@
         text-align: center;
         font-size: 1.5rem;
     }
+    .description input {
+        margin-top: 1.5rem;
+        font-weight: 300;
+        font-size: 1.25rem;
+        font-family: var(--font-family);
+        width: 100px;
+        height: 30px;
+
+    }
+    .description label {
+        margin-top: 1.5rem;
+        font-weight: 600;
+        font-size: 1.5rem;
+        font-family: var(--font-family);
+    }
+
+.textBoxes {
+    font-weight: 600;
+    position: relative;
+    margin-bottom: 3rem;
+    margin-top: 3rem;
+    padding: 0rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-size: 1.5rem;
+    font-family: var(--font-family);
+}
+
+
 
 .headers {
     padding: 0.5rem;
@@ -73,8 +114,8 @@
     .headers h3 {
         font-weight: 600;
         text-decoration: underline;
-        margin-top: 0rem;
-        margin-bottom: 0rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
         text-align: center;
         font-size: 4rem;
         background-color: rgba(var(--card-rgb), 0);
@@ -84,8 +125,7 @@
         text-decoration: underline;
         margin: 0rem;
         text-align: center;
-        font-size: 8rem;
-        transition: background 200ms, border 200ms;
+        font-size: 6rem;
         display: flex;
         flex-direction: column;
     }
@@ -99,7 +139,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
-    max-width: 100%;
+    max-width: 30%;
     width: var(--max-width);
 }
 
@@ -111,6 +151,7 @@
     transition: background 200ms, border 200ms;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
     .card:hover {
@@ -276,6 +317,61 @@
     margin: 0;
     padding: 0;
 }
+
+.tab {
+    display: inherit;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    max-width: var(--max-width);
+    width: 100%;
+    z-index: 2;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+.tabList {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(var(--callout-rgb), 0.1);
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+
+.tabItem {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+
+.activeTab {
+    background-color: rgba(var(--callout-rgb), 0.25);
+    border-color: rgba(var(--card-border-rgb), 0.25);
+    border-bottom-color: transparent;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+
+.tabPanel {
+    padding: 1rem;
+    border: 1px solid rgba(var(--card-border-rgb), 0.25);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: var(--font-family);
+}
+
 
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
