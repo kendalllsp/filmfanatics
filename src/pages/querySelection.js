@@ -416,7 +416,7 @@ const queries = () => {
                     <TabPanel>
                         {/* Query 5 */}
                         <div className={styles.description}>
-                            <p>This query segments users into five groups based on their average monthly ratings and analyzes the distribution of users among these segments over time. 
+                            <p>This query segments users into five groups based on their average annual ratings and analyzes the distribution of users among these segments over time. 
                                 It provides insights into how user preferences and behavior evolve over time, allowing for a deeper understanding of trends in user engagement and satisfaction with movies.</p>
                             <a>Enter the years of the start date and the end date that you would like to analyze before submission. The years must be valid from 1955 to 2017.</a>
                         </div>
