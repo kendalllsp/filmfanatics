@@ -81,7 +81,7 @@ const queries = () => {
         }
     };
 
-    const handleQuery2 = async (startYear, endYear) => {
+    const handleQuery2 = async () => {
         try {
             setLoading(true); // set loading state to true
             setError(null); // reset error state
@@ -363,7 +363,7 @@ const queries = () => {
                             <label htmlFor="endYear">End Year: </label>
                             <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
                         </div>
-                        {chartData && (
+                        {chartData4 && (
                             <div className={styles.description}>
                                 <h3>Actor Rating Trends Over Time</h3>
                                 <Line
