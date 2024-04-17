@@ -129,10 +129,12 @@ app.get('/api/query2', async (req, res) => {
         
         const result2 = await connection.execute(query2, { startDate: startYear, endDate: endYear });
         
-        await connection.close();
+       
 
         // Combine and send results
         res.json({ userRatingVariability: result1.rows, ratingTrends: result2.rows });
+
+        await connection.close();
         
     } catch (error) {
         console.error('Error executing SQL query:', error);
