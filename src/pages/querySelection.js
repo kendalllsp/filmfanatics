@@ -350,7 +350,6 @@ const queries = () => {
                     </TabPanel>
                     <TabPanel>
                         {/* Query 4 */}
-                    <TabPanel>
                         <div className={styles.description}>
                             <p>Analyze the trend of actor rating trends over time.</p>
                             <p>Enter the years of the start date and the end date that you would like to analyze before submission.</p>
