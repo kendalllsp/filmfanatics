@@ -77,24 +77,24 @@ const queries = () => {
     };
 
     const handleQuery2 = async (startYear, endYear) => {
-    try {
-        // Make HTTP request to backend API endpoint query2
-        const response = await axios.get('http://localhost:5000/api/query2', {
-            params: {
-                startYear: startYear,
-                endYear: endYear
-            }
-        });
+        try {
+            // Make HTTP request to backend API endpoint query2
+            const response = await axios.get('http://localhost:5000/api/query2', {
+                params: {
+                    startYear: startYear,
+                    endYear: endYear
+                }
+            });
 
-        // Extract the data from the response
-        const { userRatingVariability, ratingTrends } = response.data;
+            // Extract the data from the response
+            const { userRatingVariability, ratingTrends } = response.data;
 
-        return { userRatingVariability, ratingTrends };
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw new Error('Internal server error');
-    }
-};
+            return { userRatingVariability, ratingTrends };
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            throw new Error('Internal server error');
+        }
+    };
 
     return (
         <main className={styles.queriesPage}>
