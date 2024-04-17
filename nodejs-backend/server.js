@@ -72,6 +72,7 @@ ORDER BY gc.Year
 // define API endpoint for Query 2
 app.get('/api/query2', async (req, res) => {
     try {
+        const { startYear, endYear } = req.query;
 
         const connection = await oracledb.getConnection(dbConfig);
 
