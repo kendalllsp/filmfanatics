@@ -12,9 +12,9 @@ app.use(cors());
 // Database connection configuration (using env variables)
 require('dotenv').config();
 const dbConfig = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    connectString: process.env.DB_CONNECT
+    user: "c.kroll",
+    password: "tUmKQmjdMsgzKVIoz6kXT9R7",
+    connectString: "oracle.cise.ufl.edu/orcl"
 };
 
 // define API endpoint for Query 1
