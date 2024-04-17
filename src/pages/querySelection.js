@@ -21,6 +21,11 @@ const queries = () => {
     const [chartData3, setChartData3] = useState(null);
     const [chartData4, setChartData4] = useState(null);
     const [chartData5, setChartData5] = useState(null);
+    const [day, setDay] = useState('');
+
+    const handleDayChange = (e) => {
+        setDay(e.target.value);
+    }
 
 
     const handleTabSelect = (index) => {
@@ -124,6 +129,36 @@ const queries = () => {
         }
         finally {
             setLoading(false); // reset loading state
+        }
+    };
+
+    // Function to handle Query 3
+    const handleQuery3 = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Make HTTP request to backend API for Query 4
+            const response = await axios.get('http://localhost:5000/api/query3', {
+                params: {
+                    startYear: startYear,
+                    endYear: endYear,
+                    day: day
+                }
+            });
+
+            // Extract data from the response
+            const { data } = response;
+            console.log('Response data:', data);
+
+
+            setChartData4(data);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('An error occurred. Please try again.');
+        } finally {
+            setLoading(false); // Reset loading state
         }
     };
 
@@ -347,6 +382,42 @@ const queries = () => {
                     </TabPanel>
                     <TabPanel>
                         {/* Query 3 */}
+                        <div className={styles.description}>
+                            <p> Analyze the trend of movie ratings over time based day of the week the movie was released</p>
+                            <a>Enter the years of the start date, end date, and day of the week that you would like to analyze before submission. The years must be valid from 1955 to 2017.</a>
+                        </div>
+
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">Start Year: </label>
+                            <input type="number" id="startYear" value={startYear} onChange={handleStartYearChange} />
+                        </div>
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">End Year: </label>
+                            <input type="number" id="endYear" value={endYear} onChange={handleEndYearChange} />
+                        </div>
+                        {/*
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">Day: </label>
+                            <input type="select" id="day" value={day} onChange={handleDayChange} />
+                        </div>
+                        */}
+                        <div className={styles.description}>
+                            <label htmlFor="endYear">Genre: </label>
+                            <select value={day} onChange={handleDayChange} style={{ width: '100px', height: '30px', marginBottom: '2rem', marginTop: '1rem' }}>
+                                <option value="">Choose Day</option>
+                                <option value="Sunday">Sunday</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </div>
+                        <button className={styles.searchButton} onClick={handleQuery3} disabled={loading}>
+                            {loading ? 'Loading...' : 'Submit'}
+                        </button>
+
                     </TabPanel>
                     <TabPanel>
                         {/* Query 4 */}

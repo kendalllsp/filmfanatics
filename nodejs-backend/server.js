@@ -163,6 +163,36 @@ ORDER BY
     }
 });
 
+app.get('/api/query3', async (req, res) => {
+    try {
+        const { startYear, endYear, day, genre } = req.query;
+
+        const connection = await oracledb.getConnection(dbConfig);
+
+        const result = await connection.execute(`
+SELECT
+    TO_CHAR(m.RELEASEDATE, 'YYYY') AS Release_Year,
+    ROUND(AVG(r.STARRATING), 2) AS Avg_Rating
+FROM
+    carbajalc.MOVIE m
+JOIN carbajalc.RATINGS r ON m.MOVIEID = r.MOVIEID
+WHERE
+    TO_CHAR(m.RELEASEDATE, 'Day') LIKE :day
+    AND JSON_VALUE(m.GENRE, '$[*].name' IS NOT NULL
+    AND EXTRACT(YEAR FROM m.RELEASEDATE) BETWEEN :startYear AND :endYear
+GROUP BY
+    TO_CHAR(m.RELEASEDATE, 'D'), TO_CHAR(m.RELEASEDATE, 'Day'), TO_CHAR(m.RELEASEDATE, 'YYYY'), JSON_VALUE(m.GENRE, '$[*].name')
+ORDER BY
+    Release_Year
+`, [startYear, endYear, day]);
+
+
+    } catch (error) {
+        console.error('Error executing SQL query:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
+});
 
 // Define API endpoint for Query 4
 app.get('/api/query4', async (req, res) => {
