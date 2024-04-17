@@ -78,6 +78,8 @@ const queries = () => {
 
     const handleQuery2 = async (startYear, endYear) => {
         try {
+            setLoading(true); // set loading state to true
+            setError(null); // reset error state
             // Make HTTP request to backend API endpoint query2
             const response = await axios.get('http://localhost:5000/api/query2', {
                 params: {
@@ -89,10 +91,15 @@ const queries = () => {
             // Extract the data from the response
             const { userRatingVariability, ratingTrends } = response.data;
 
+            console.log('API response:', response);
+
             return { userRatingVariability, ratingTrends };
         } catch (error) {
             console.error('Error fetching data:', error);
             throw new Error('Internal server error');
+        }
+        finally {
+            setLoading(false); // reset loading state
         }
     };
 
