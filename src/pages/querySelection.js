@@ -88,12 +88,31 @@ const queries = () => {
                 }
             });
 
+
+            
             // Extract the data from the response
             const { userRatingVariability, ratingTrends } = response.data;
 
-            console.log('API response:', response);
 
-            return { userRatingVariability, ratingTrends };
+            console.log('Response data:', response.data);
+
+            const chartData = {
+                labels: userRatingVariability.map(entry => entry.ratingYear),
+                datasets: [
+                    {
+                        label: 'Average Rating Standard Deviation',
+                        data: userRatingVariability.map(entry => entry.Average_Rating_Std_Deviation)
+                    },
+                    {
+                        label: 'Moving Average Rating',
+                        data: ratingTrends.map(entry => entry.moving_avg_rating)
+                    }
+                ]
+            };
+            
+
+            setChartData(chartData);
+            
         } catch (error) {
             console.error('Error fetching data:', error);
             throw new Error('Internal server error');

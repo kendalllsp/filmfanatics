@@ -77,60 +77,83 @@ app.get('/api/query2', async (req, res) => {
         const connection = await oracledb.getConnection(dbConfig);
 
         // Query 1: User Rating Variability
+        
         const query1 = `
-            WITH user_rating_variability AS (
-                SELECT EXTRACT(YEAR FROM TO_DATE(:startYear, 'YYYY')) AS ratingYear,
-                       r.userId,
-                       STDDEV(r.starrating) AS Rating_Standard_Deviation
-                FROM CARBAJALC.ratings r
-                WHERE TO_DATE(:startYear, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
-                      AND TO_DATE(:endYear, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
-                GROUP BY EXTRACT(YEAR FROM TO_DATE(:startYear, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')), r.userid
-            )
-            SELECT ratingYear,
-                   ROUND(AVG(Rating_Standard_Deviation), 2) AS Average_Rating_Std_Deviation
-            FROM user_rating_variability
-            GROUP BY ratingYear
-            ORDER BY ratingYear
+           WITH user_rating_variability AS (
+    SELECT EXTRACT(YEAR FROM TO_DATE( '1970-01-01', 'YYYY-MM-DD' ) + NUMTODSINTERVAL( r.ratingstimestamp, 'SECOND' )) AS ratingYear,
+           r.userId,
+           STDDEV(r.starrating) AS Rating_Standard_Deviation
+    FROM CARBAJALC.ratings r
+    WHERE TO_DATE(:startYear, 'YYYY') <= TO_DATE( '1970-01-01', 'YYYY-MM-DD' ) + NUMTODSINTERVAL( r.ratingstimestamp, 'SECOND' )
+    AND TO_DATE(:endYear, 'YYYY') >= TO_DATE( '1970-01-01', 'YYYY-MM-DD' ) + NUMTODSINTERVAL( r.ratingstimestamp, 'SECOND' )
+    GROUP BY EXTRACT(YEAR FROM TO_DATE( '1970-01-01', 'YYYY-MM-DD' ) + NUMTODSINTERVAL( r.ratingstimestamp, 'SECOND' )), r.userid
+)
+SELECT ratingYear,
+       ROUND(AVG(Rating_Standard_Deviation), 2) AS Average_Rating_Std_Deviation
+FROM user_rating_variability
+GROUP BY ratingYear
+ORDER BY ratingYear
         `;
         
-        const result1 = await connection.execute(query1, [startYear, startYear, endYear, startYear ]);
+        const result1 = await connection.execute(query1, [ startYear, endYear ]);
+  
 // Query 2: Rating Trends
+        
+        
         const query2 = `
             WITH RatingTrends AS (
-                SELECT
-                    m.title,
-                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY')) AS rating_month,
-                    ROUND(AVG(r.starrating), 2) AS avg_rating
-                FROM
-                    CARBAJALC.movie m, CARBAJALC.ratings r
-                WHERE
-                    m.movieid = r.movieid
-                      AND TO_DATE(:startDate, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
-                      AND TO_DATE(:endDate, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
-                GROUP BY
-                    m.title,
-                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
-                ORDER BY
-                    m.title,
-                    EXTRACT(MONTH FROM TO_DATE(:startDate, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
-            )
-            SELECT
-                title,
-                rating_month,
-                avg_rating,
-                ROUND(AVG(avg_rating) OVER (PARTITION BY title ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW), 2) AS moving_avg_rating
-            FROM RatingTrends
+    SELECT
+        m.title,
+        EXTRACT(MONTH FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')) AS rating_month,
+        EXTRACT(YEAR FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')) AS rating_year,
+        ROUND(AVG(r.starrating), 2) AS avg_rating
+    FROM
+        CARBAJALC.movie m
+        INNER JOIN CARBAJALC.ratings r ON m.movieid = r.movieid
+    WHERE
+        TO_DATE(:startYear, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+        AND TO_DATE(:endYear, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+    GROUP BY
+        m.title,
+        EXTRACT(YEAR FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')),
+        EXTRACT(MONTH FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
+    ORDER BY
+        m.title,
+        EXTRACT(YEAR FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')),
+        EXTRACT(MONTH FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
+)
+SELECT
+    rating_year,
+    ROUND(AVG(moving_avg_rating), 2) AS moving_avg_rating
+FROM (
+    SELECT
+        rating_year,
+        AVG(avg_rating) OVER (PARTITION BY rating_year ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW) AS moving_avg_rating
+    FROM
+        RatingTrends
+)
+GROUP BY
+    rating_year
+ORDER BY
+    rating_year
         `;
         
-        const result2 = await connection.execute(query2, { startDate: startYear, endDate: endYear });
-        console.log('response1:', result1.rows);
-        console.log('response2:', result2.rows);
+        const result2 = await connection.execute(query2, [startYear, endYear]);
         
-        await connection.close();
+        console.log('response1:', result1);
+        console.log('response2:', result2);
+
+
 
         // Combine and send results
         res.json({ userRatingVariability: result1.rows, ratingTrends: result2.rows });
+        
+
+        try {
+            await connection.close();
+        } catch (error) {
+            console.error('Error closing database connection:', error);
+        }
 
         
         
