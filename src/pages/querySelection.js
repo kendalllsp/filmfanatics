@@ -8,6 +8,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
+import { parseJsonSourceFileConfigFileContent } from 'typescript';
 
 const queries = () => {
     const [selectedTab, setSelectedTab] = useState(0);
@@ -103,29 +104,69 @@ const queries = () => {
         }
     };
 
-    const handleQuery5 = async (startYear, endYear) => {
+
+    const handleQuery5 = async () => {
         try {
-            setLoading(true); // set loading state to true
-            setError(null); // reset error state
-            // Make HTTP request to backend API endpoint query2
-            const response = await axios.get('http://localhost:5000/api/query5', {
-                params: {
-                    startYear: startYear,
-                    endYear: endYear
-                }
-            });
+            if (true) {
+                setLoading(true); // set loading state to true
+                setError(null); // reset error state
 
-            console.log('API response:', response);
+                // make HTTP request to backend API
+                const response = await axios.get(`http://localhost:5000/api/query5`, {
+                    params: {
+                        startYear: startYear,
+                        endYear: endYear
+                        
+                    }
+                });
 
-            // TODO extract some data!!
-            const { userRatingVariability, ratingTrends } = response.data;
-            return { userRatingVariability, ratingTrends };
+                console.log('API response:', response.data);
+                
 
+                
+                const chartData = {
+                    /*labels: response.data.map(item => {
+                        console.log(item[0]);
+                        return parseInt(item[0]);
+                    }),*/
+                    labels: [],
+                    datasets: [] // datasets for each segment
+                };
+        
+                // iterate over response data
+                response.data.map(item => {
+                    const date = parseInt(item[0]); // month
+                    const segment = parseInt(item[1]); // segment
+                    const avgRating = parseFloat(item[3]); // average rating
+        
+                    // if date is new, add it to unique dates
+                    if (!chartData.labels.includes(date)) {
+                        chartData.labels.push(date);
+                    }
+        
+                    // create segment dataset if it doesnt exist
+                    if (!chartData.datasets[segment - 1]) {
+                        chartData.datasets[segment - 1] = {
+                            label: `Rating Segment ${segment}`,
+                            data: [],
+                            fill: false,
+                            borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
+                            tension: 0.1
+                        };
+                    }
+                    
+                    
+                    // add average rating to the dataset for the segment
+                    chartData.datasets[segment - 1].data.push(avgRating);
+                });
+        
+                setChartData(chartData); 
+
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
-            throw new Error('Internal server error');
-        }
-        finally {
+            setError('An error occurred. Please try again.');
+        } finally {
             setLoading(false); // reset loading state
         }
     };

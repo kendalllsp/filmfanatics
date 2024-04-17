@@ -159,7 +159,7 @@ app.get('/api/query5', async (req, res) => {
                     AVG(r.starrating) AS avg_rating,
                     COUNT(r.starrating) AS num_ratings
                 FROM
-                    ratings r
+                    CARBAJALC.ratings r
                 WHERE 
                     TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') BETWEEN TO_DATE('01-JAN-' || :startYear, 'DD-MON-YYYY') AND TO_DATE('31-DEC-' || :endYear, 'DD-MON-YYYY')
                 GROUP BY
