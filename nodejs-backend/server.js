@@ -177,7 +177,7 @@ FROM
     carbajalc.MOVIE m
 JOIN carbajalc.RATINGS r ON m.MOVIEID = r.MOVIEID
 WHERE
-    TO_CHAR(m.RELEASEDATE, 'Day') LIKE :day
+    TO_CHAR(m.RELEASEDATE, 'Day') LIKE '%'  :day  '%'
     AND JSON_VALUE(m.GENRE, '$[*].name' IS NOT NULL
     AND EXTRACT(YEAR FROM m.RELEASEDATE) BETWEEN :startYear AND :endYear
 GROUP BY
