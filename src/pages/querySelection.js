@@ -249,7 +249,7 @@ const queries = () => {
 
                     <TabPanel>
                         <div className={styles.description}>
-                            <p>Analyze the trend of genre diversity over time by calculating the Shannon diversity index for genres applied to movies each year.</p>
+                            <p>Analyze the trend of genre diversity over time by calculating the Shannon diversity index for genres applied to movies each year. The higher the index is, the more diverse the genres in that year were.</p>
                             <a>Enter the years of the start date and the end date that you would like to analyze before submission. The years must be valid from 1903 to 2018.</a>
                         </div>
                         
