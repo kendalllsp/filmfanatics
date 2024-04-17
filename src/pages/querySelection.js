@@ -123,6 +123,36 @@ const queries = () => {
         }
     };
 
+    // Function to handle Query 4
+    const handleQuery4 = async () => {
+        try {
+            setLoading(true); 
+            setError(null);
+
+            // Make HTTP request to backend API for Query 4
+            const response = await axios.get('http://localhost:5000/api/query4', {
+                params: {
+                    startYear: startYear,
+                    endYear: endYear
+                }
+            });
+
+            // Extract data from the response
+            const { data } = response;
+            console.log('Response data:', data);
+
+            
+            setChartData(data);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('An error occurred. Please try again.');
+        } finally {
+            setLoading(false); // Reset loading state
+        }
+    };
+    
+
 
     const handleQuery5 = async () => {
         try {
