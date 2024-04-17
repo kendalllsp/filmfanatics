@@ -107,15 +107,32 @@ const queries = () => {
             console.log('Response data:', response.data);
 
             const chartData2 = {
-                labels: userRatingVariability.map(entry => entry.ratingYear),
+                labels: userRatingVariability.map(item => {
+                    console.log(item[0]);
+                    return parseInt(item[0], 10);
+                }),
                 datasets: [
-                    {
+                    /*{
                         label: 'Average Rating Standard Deviation',
-                        data: userRatingVariability.map(entry => entry.Average_Rating_Std_Deviation)
-                    },
+                        //data: userRatingVariability.map(entry => entry.Average_Rating_Std_Deviation)
+                        data: userRatingVariability.map(item => {
+                            console.log(item[1]);
+                            return parseFloat(item[1]);
+                        }),
+                        fill: false,
+                        borderColor: 'rgba(75,192,192,1)',
+                        tension: 0.1
+                    }*/
                     {
                         label: 'Moving Average Rating',
-                        data: ratingTrends.map(entry => entry.moving_avg_rating)
+                        //data: ratingTrends.map(entry => entry.moving_avg_rating)
+                        data: ratingTrends.map(item => {
+                            console.log(item[1]);
+                            return parseFloat(item[1]);
+                        }),
+                        fill: false,
+                        borderColor: 'rgba(75,192,192,1)',
+                        tension: 0.1
                     }
                 ]
             };
@@ -470,7 +487,7 @@ const queries = () => {
                     <TabPanel>
                         {/* Query 5 */}
                         <div className={styles.description}>
-                            <p>This query segments users into five groups based on their average monthly ratings and analyzes the distribution of users among these segments over time. 
+                            <p>This query segments users into five groups based on their average annual ratings and analyzes the distribution of users among these segments over time. 
                                 It provides insights into how user preferences and behavior evolve over time, allowing for a deeper understanding of trends in user engagement and satisfaction with movies.</p>
                             <a>Enter the years of the start date and the end date that you would like to analyze before submission. The years must be valid from 1955 to 2017.</a>
                         </div>
