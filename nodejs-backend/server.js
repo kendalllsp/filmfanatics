@@ -173,14 +173,14 @@ app.get('/api/query4', async (req, res) => {
         }
         const connection = await oracledb.getConnection(dbConfig);
 
-        // execute SQL query
+        // Execute SQL query
         const result = await connection.execute(`
             WITH ActorRatingStats AS (
                 SELECT
                     a.actor_name,
                     m.title,
-                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') AS rating_month,
-                    AVG(r.rating) AS avg_rating,
+                    EXTRACT(YEAR FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')) AS rating_year,
+                    ROUND(AVG(r.rating), 2) AS avg_rating,
                     COUNT(*) AS num_ratings
                 FROM
                     CARBAJALC.movies m
@@ -188,23 +188,24 @@ app.get('/api/query4', async (req, res) => {
                     JOIN CARBAJALC.actors a ON ma.actorId = a.actorId
                     JOIN CARBAJALC.ratings r ON m.movieId = r.movieId
                 WHERE 
-                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') BETWEEN TO_DATE('01-JAN-' || :startYear, 'DD-MON-YYYY') AND TO_DATE('31-DEC-' || :endYear, 'DD-MON-YYYY')
+                    TO_DATE(:startYear, 'YYYY') <= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
+                    AND TO_DATE(:endYear, 'YYYY') >= TO_DATE('1970', 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND')
                 GROUP BY
-                    a.actor_name, m.title, TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH')
+                    a.actor_name, m.title, EXTRACT(YEAR FROM TO_DATE('1970-01-01', 'YYYY-MM-DD') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'))
             ),
             ActorRatingTrends AS (
                 SELECT
                     actor_name,
-                    rating_month,
+                    rating_year,
                     AVG(avg_rating) AS avg_rating,
                     AVG(num_ratings) AS avg_num_ratings,
-                    AVG(avg_rating) OVER (PARTITION BY actor_name ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW) AS moving_avg_rating
+                    AVG(avg_rating) OVER (PARTITION BY actor_name ORDER BY rating_year ROWS BETWEEN 12 PRECEDING AND CURRENT ROW) AS moving_avg_rating
                 FROM
                     ActorRatingStats
             )
             SELECT
                 actor_name,
-                rating_month,
+                rating_year,
                 avg_rating,
                 moving_avg_rating,
                 avg_num_ratings
@@ -212,10 +213,10 @@ app.get('/api/query4', async (req, res) => {
                 ActorRatingTrends
             ORDER BY
                 actor_name,
-                rating_month
+                rating_year
         `, [startYear, endYear]);
 
-        // results go to frontend
+        // Send query results to frontend
         res.json(result.rows);
 
         await connection.close();
