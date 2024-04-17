@@ -72,11 +72,6 @@ ORDER BY gc.Year
 // define API endpoint for Query 2
 app.get('/api/query2', async (req, res) => {
     try {
-        // extract parameters from request, if any
-        const { startYear, endYear } = req.query;
-        if (!startYear || !endYear) {
-            return res.status(400).json({ error: 'Start year and end year are required' });
-        }
 
         const connection = await oracledb.getConnection(dbConfig);
 
