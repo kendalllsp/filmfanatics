@@ -16,7 +16,11 @@ const queries = () => {
     const [endYear, setEndYear] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [chartData, setChartData] = useState(null);
+    const [chartData1, setChartData1] = useState(null);
+    const [chartData2, setChartData2] = useState(null);
+    const [chartData3, setChartData3] = useState(null);
+    const [chartData4, setChartData4] = useState(null);
+    const [chartData5, setChartData5] = useState(null);
 
 
     const handleTabSelect = (index) => {
@@ -49,7 +53,7 @@ const queries = () => {
                 console.log('API response:', response.data);
                 
 
-                setChartData({
+                setChartData1({
                     labels: response.data.map(item => {
                         console.log(item[0]);
                         return parseInt(item[0], 10);
@@ -97,7 +101,7 @@ const queries = () => {
 
             console.log('Response data:', response.data);
 
-            const chartData = {
+            const chartData2 = {
                 labels: userRatingVariability.map(entry => entry.ratingYear),
                 datasets: [
                     {
@@ -112,7 +116,7 @@ const queries = () => {
             };
             
 
-            setChartData(chartData);
+            setChartData2(chartData2);
             
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -142,7 +146,7 @@ const queries = () => {
             console.log('Response data:', data);
 
             
-            setChartData(data);
+            setChartData4(data);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -173,7 +177,7 @@ const queries = () => {
                 
 
                 
-                const chartData = {
+                const chartData5 = {
                     /*labels: response.data.map(item => {
                         console.log(item[0]);
                         return parseInt(item[0]);
@@ -189,13 +193,13 @@ const queries = () => {
                     const avgRating = parseFloat(item[3]); // average rating
         
                     // if date is new, add it to unique dates
-                    if (!chartData.labels.includes(date)) {
-                        chartData.labels.push(date);
+                    if (!chartData5.labels.includes(date)) {
+                        chartData5.labels.push(date);
                     }
         
                     // create segment dataset if it doesnt exist
-                    if (!chartData.datasets[segment - 1]) {
-                        chartData.datasets[segment - 1] = {
+                    if (!chartData5.datasets[segment - 1]) {
+                        chartData5.datasets[segment - 1] = {
                             label: `Rating Segment ${segment}`,
                             data: [],
                             fill: false,
@@ -206,10 +210,10 @@ const queries = () => {
                     
                     
                     // add average rating to the dataset for the segment
-                    chartData.datasets[segment - 1].data.push(avgRating);
+                    chartData5.datasets[segment - 1].data.push(avgRating);
                 });
         
-                setChartData(chartData); 
+                setChartData5(chartData5); 
 
             }
         } catch (error) {
@@ -257,11 +261,11 @@ const queries = () => {
                             <label htmlFor="endYear">End Year: </label>
                             <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
                         </div>
-                        {chartData && (
+                        {chartData1 && (
                             <div className={styles.description}>
                                 <h3>Genre Diversity Over Time</h3>
                                 <Line
-                                    data={chartData}
+                                    data={chartData1}
                                     options={{
                                         scales: {
                                             x: {
@@ -307,11 +311,11 @@ const queries = () => {
                             <label htmlFor="endYear">End Year: </label>
                             <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
                         </div>
-                        {chartData && (
+                        {chartData2 && (
                             <div className={styles.description}>
                                 <h3>Rating Statistics Over Time</h3>
                                 <Line
-                                    data={chartData}
+                                    data={chartData2}
                                     options={{
                                         scales: {
                                             x: {
@@ -363,11 +367,11 @@ const queries = () => {
                             <label htmlFor="endYear">End Year: </label>
                             <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
                         </div>
-                        {chartData && (
+                        {chartData5 && (
                             <div className={styles.description}>
                                 <h3>Rating Statistics Over Time</h3>
                                 <Line
-                                    data={chartData}
+                                    data={chartData5}
                                     options={{
                                         scales: {
                                             x: {
