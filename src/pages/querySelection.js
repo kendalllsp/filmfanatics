@@ -350,7 +350,53 @@ const queries = () => {
                     </TabPanel>
                     <TabPanel>
                         {/* Query 4 */}
+                    <TabPanel>
+                        <div className={styles.description}>
+                            <p>Analyze the trend of actor rating trends over time.</p>
+                            <p>Enter the years of the start date and the end date that you would like to analyze before submission.</p>
+                        </div>
+                    
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">Start Year: </label>
+                            <input type="number" id="startYear" value={startYear} onChange={handleStartYearChange} />
+                        </div>
+                        <div className={styles.description}>
+                            <label htmlFor="endYear">End Year: </label>
+                            <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
+                        </div>
+                        {chartData && (
+                            <div className={styles.description}>
+                                <h3>Actor Rating Trends Over Time</h3>
+                                <Line
+                                    data={chartData}
+                                    options={{
+                                        scales: {
+                                            x: {
+                                                type: 'linear',
+                                                position: 'bottom',
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            },
+                                            y: {
+                                                type: 'linear',
+                                                position: 'left',
+                                                ticks: {
+                                                    stepSize: 0.5
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    plugins={{ legend: false }}
+                                />
+                            </div>
+                        )}
+                    
+                        <button className={styles.searchButton} onClick={handleQuery4} disabled={loading}>
+                            {loading ? 'Loading...' : 'Submit'}
+                        </button>
                     </TabPanel>
+
                     <TabPanel>
                         {/* Query 5 */}
                         <div className={styles.description}>
