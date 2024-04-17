@@ -103,6 +103,33 @@ const queries = () => {
         }
     };
 
+    const handleQuery5 = async (startYear, endYear) => {
+        try {
+            setLoading(true); // set loading state to true
+            setError(null); // reset error state
+            // Make HTTP request to backend API endpoint query2
+            const response = await axios.get('http://localhost:5000/api/query5', {
+                params: {
+                    startYear: startYear,
+                    endYear: endYear
+                }
+            });
+
+            console.log('API response:', response);
+
+            // TODO extract some data!!
+            const { userRatingVariability, ratingTrends } = response.data;
+            return { userRatingVariability, ratingTrends };
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            throw new Error('Internal server error');
+        }
+        finally {
+            setLoading(false); // reset loading state
+        }
+    };
+
     return (
         <main className={styles.queriesPage}>
             <Link href="/">
@@ -232,6 +259,53 @@ const queries = () => {
                     </TabPanel>
                     <TabPanel>
                         {/* Query 5 */}
+                        <div className={styles.description}>
+                            <p>This query segments users into five groups based on their average monthly ratings and analyzes the distribution of users among these segments over time. 
+                                It provides insights into how user preferences and behavior evolve over time, allowing for a deeper understanding of trends in user engagement and satisfaction with movies.</p>
+                            <a>Enter the years of the start date and the end date that you would like to analyze before submission. The years must be valid from 1955 to 2017.</a>
+                        </div>
+
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">Start Year: </label>
+                            <input type="number" id="startYear" value={startYear} onChange={handleStartYearChange} />
+                        </div>
+                        <div className={styles.description}>
+                            <label htmlFor="endYear">End Year: </label>
+                            <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
+                        </div>
+                        {chartData && (
+                            <div className={styles.description}>
+                                <h3>Rating Statistics Over Time</h3>
+                                <Line
+                                    data={chartData}
+                                    options={{
+                                        scales: {
+                                            x: {
+                                                type: 'linear',
+                                                position: 'bottom',
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            },
+                                            y: {
+                                                type: 'linear',
+                                                position: 'left',
+                                                min: 0,
+                                                max: 6,
+                                                ticks: {
+                                                    stepSize: 0.5
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    plugins={{ legend: false }}
+                                />
+                            </div>
+                        )}
+
+                        <button className={styles.searchButton} onClick={handleQuery5} disabled={loading}>
+                            {loading ? 'Loading...' : 'Submit'}
+                        </button>
                     </TabPanel>
                 </Tabs>
             </div>
