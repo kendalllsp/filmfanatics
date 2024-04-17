@@ -168,7 +168,54 @@ const queries = () => {
                         </button>
                     </TabPanel>
                     <TabPanel>
-                        {/* Query 2 */}
+                        <div className={styles.description}>
+                            <p>Analyze the trend of user rating variability over time by calculating the standard deviation of ratings per user each year. This query also computes the
+                                monthly average ratings for each movie, then calculates a 12-month moving average to smooth out fluctuations and identify long-term trends in movie ratings over time.
+                                It offers a more comprehensive analysis of movie rating trends.</p>
+                            <a>Enter the years of the start date and the end date that you would like to analyze before submission. The years must be valid from 1903 to 2018.</a>
+                        </div>
+
+                        <div className={styles.description}>
+                            <label htmlFor="startYear">Start Year: </label>
+                            <input type="number" id="startYear" value={startYear} onChange={handleStartYearChange} />
+                        </div>
+                        <div className={styles.description}>
+                            <label htmlFor="endYear">End Year: </label>
+                            <input type="number" id="endYear" style={{ marginBottom: '2rem' }} value={endYear} onChange={handleEndYearChange} />
+                        </div>
+                        {chartData && (
+                            <div className={styles.description}>
+                                <h3>Rating Variability and Moving Average Over Time</h3>
+                                <Line
+                                    data={chartData}
+                                    options={{
+                                        scales: {
+                                            x: {
+                                                type: 'linear',
+                                                position: 'bottom',
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            },
+                                            y: {
+                                                type: 'linear',
+                                                position: 'left',
+                                                min: 0,
+                                                max: 6,
+                                                ticks: {
+                                                    stepSize: 0.5
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    plugins={{ legend: false }}
+                                />
+                            </div>
+                        )}
+
+                        <button className={styles.searchButton} onClick={handleQuery2} disabled={loading}>
+                            {loading ? 'Loading...' : 'Submit'}
+                        </button>
                     </TabPanel>
                     <TabPanel>
                         {/* Query 3 */}
