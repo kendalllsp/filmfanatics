@@ -163,6 +163,69 @@ ORDER BY
     }
 });
 
+
+// Define API endpoint for Query 4
+app.get('/api/query4', async (req, res) => {
+    try {
+        const { startYear, endYear } = req.query;
+        if (!startYear || !endYear) {
+            return res.status(400).json({ error: 'Start year and end year are required' });
+        }
+        const connection = await oracledb.getConnection(dbConfig);
+
+        // execute SQL query
+        const result = await connection.execute(`
+            WITH ActorRatingStats AS (
+                SELECT
+                    a.actor_name,
+                    m.title,
+                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') AS rating_month,
+                    AVG(r.rating) AS avg_rating,
+                    COUNT(*) AS num_ratings
+                FROM
+                    CARBAJALC.movies m
+                    JOIN CARBAJALC.movie_actors ma ON m.movieId = ma.movieId
+                    JOIN CARBAJALC.actors a ON ma.actorId = a.actorId
+                    JOIN CARBAJALC.ratings r ON m.movieId = r.movieId
+                WHERE 
+                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') BETWEEN TO_DATE('01-JAN-' || :startYear, 'DD-MON-YYYY') AND TO_DATE('31-DEC-' || :endYear, 'DD-MON-YYYY')
+                GROUP BY
+                    a.actor_name, m.title, TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH')
+            ),
+            ActorRatingTrends AS (
+                SELECT
+                    actor_name,
+                    rating_month,
+                    AVG(avg_rating) AS avg_rating,
+                    AVG(num_ratings) AS avg_num_ratings,
+                    AVG(avg_rating) OVER (PARTITION BY actor_name ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW) AS moving_avg_rating
+                FROM
+                    ActorRatingStats
+            )
+            SELECT
+                actor_name,
+                rating_month,
+                avg_rating,
+                moving_avg_rating,
+                avg_num_ratings
+            FROM
+                ActorRatingTrends
+            ORDER BY
+                actor_name,
+                rating_month
+        `, [startYear, endYear]);
+
+        // results go to frontend
+        res.json(result.rows);
+
+        await connection.close();
+    } catch (error) {
+        console.error('Error executing SQL query:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 // Define API endpoint for Query 5
 app.get('/api/query5', async (req, res) => {
     try {
@@ -223,68 +286,6 @@ app.get('/api/query5', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-// Define API endpoint for Query 6
-app.get('/api/query6', async (req, res) => {
-    try {
-        const { startYear, endYear } = req.query;
-        if (!startYear || !endYear) {
-            return res.status(400).json({ error: 'Start year and end year are required' });
-        }
-        const connection = await oracledb.getConnection(dbConfig);
-
-        // execute SQL query
-        const result = await connection.execute(`
-            WITH ActorRatingStats AS (
-                SELECT
-                    a.actor_name,
-                    m.title,
-                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') AS rating_month,
-                    AVG(r.rating) AS avg_rating,
-                    COUNT(*) AS num_ratings
-                FROM
-                    CARBAJALC.movies m
-                    JOIN CARBAJALC.movie_actors ma ON m.movieId = ma.movieId
-                    JOIN CARBAJALC.actors a ON ma.actorId = a.actorId
-                    JOIN CARBAJALC.ratings r ON m.movieId = r.movieId
-                WHERE 
-                    TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH') BETWEEN TO_DATE('01-JAN-' || :startYear, 'DD-MON-YYYY') AND TO_DATE('31-DEC-' || :endYear, 'DD-MON-YYYY')
-                GROUP BY
-                    a.actor_name, m.title, TRUNC(TO_DATE(1970, 'YYYY') + NUMTODSINTERVAL(r.ratingstimestamp, 'SECOND'), 'MONTH')
-            ),
-            ActorRatingTrends AS (
-                SELECT
-                    actor_name,
-                    rating_month,
-                    AVG(avg_rating) AS avg_rating,
-                    AVG(num_ratings) AS avg_num_ratings,
-                    AVG(avg_rating) OVER (PARTITION BY actor_name ORDER BY rating_month ROWS BETWEEN 12 PRECEDING AND CURRENT ROW) AS moving_avg_rating
-                FROM
-                    ActorRatingStats
-            )
-            SELECT
-                actor_name,
-                rating_month,
-                avg_rating,
-                moving_avg_rating,
-                avg_num_ratings
-            FROM
-                ActorRatingTrends
-            ORDER BY
-                actor_name,
-                rating_month
-        `, [startYear, endYear]);
-
-        // results go to frontend
-        res.json(result.rows);
-
-        await connection.close();
-    } catch (error) {
-        console.error('Error executing SQL query:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 
 
 // start the server
